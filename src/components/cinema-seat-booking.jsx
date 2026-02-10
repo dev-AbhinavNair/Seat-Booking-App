@@ -1,6 +1,6 @@
 //rafce to write boiler code
 
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 const CinemaSeatBooking = ({
     layout = {
@@ -55,7 +55,7 @@ const CinemaSeatBooking = ({
             const seatTypeInfo = getSeatType(row);
 
             for(let seat=0; seat < layout.seatsPerRow; seat++) {
-                const seatId = `${String.fromCharCode(65 + row)}${seat+1}`; //SEARCH THIS
+                const seatId = `${String.fromCharCode(65 + row)}${seat+1}`;
 
                 seatRow.push({
                     id: seatId,
@@ -159,12 +159,15 @@ const CinemaSeatBooking = ({
     };
 
     const handleBooking = () => {
-        // onBookingComplete(selectedSeats);
-
         if(selectedSeats.length === 0) {
             alert(`Select at least one seat and then proceed with booking.`);
             return;
         }
+
+        const existingBookedSeats = localStorage.getItem('bookedSeats');
+        const bookedArray = existingBookedSeats ? JSON.parse(existingBookedSeats) : [];
+        const newBookedSeats = [...bookedArray, ...selectedSeats];
+        localStorage.setItem('bookedSeats', JSON.stringify(newBookedSeats));
 
         setSeats((prevSeats) => {
             return prevSeats.map((row) => row.map((seat) => {
@@ -187,6 +190,53 @@ const CinemaSeatBooking = ({
 
         setSelectedSeats([]);
     } 
+
+    useEffect(() => {
+    const storedSeats = localStorage.getItem('selectedSeats');
+    
+    if(storedSeats) {
+        try {
+            const parsedSeats = JSON.parse(storedSeats);
+            setSelectedSeats(parsedSeats);
+            
+            setSeats((prevSeats) => {
+                return prevSeats.map((row, rIdx) => 
+                    row.map((seat, sIdx) => ({
+                        ...seat,
+                        selected: parsedSeats.some(selectedSeat => selectedSeat.id === seat.id)
+                    }))
+                );
+            });
+        }
+        catch (error) {
+            console.error(`Error parsing seats: ${error}`);
+        }
+    }
+}, []);
+
+
+useEffect( () => {
+        const storedBookedSeats = localStorage.getItem('bookedSeats');
+        
+        if(storedBookedSeats) {
+            try {
+                const parsedBookedSeats = JSON.parse(storedBookedSeats);
+                const bookedSeatIds = parsedBookedSeats.map(seat => seat.id);
+                
+                setSeats((prevSeats) => {
+                    return prevSeats.map((row, rIdx) => row.map((seat, sIdx) => {
+                        if(bookedSeatIds.includes(seat.id)) {
+                            return {...seat, status: "booked", selected: false};
+                        }
+                        return seat;
+                    }));
+                });
+            }
+            catch (error) {
+                console.error(`Error parsing booked seats: ${error}`);
+            }
+        }
+    }, []);
 
   return (
     <div className='w-full min-h-screen bg-gray-50 p-4'>
