@@ -33,6 +33,60 @@ const CinemaSeatBooking = ({
         return bookings[date] || [];
     };
 
+    const getAllBookingsWithDates = () => {
+        const storedBookings = localStorage.getItem('cinemaBookings');
+        if (!storedBookings) return {};
+        
+        return JSON.parse(storedBookings);
+    };
+
+    const cancelBooking = (date, seatIds) => {
+        const confirmed = window.confirm('Are you sure you want to cancel this booking?');
+        if (!confirmed) return;
+
+        const bookings = getAllBookingsWithDates();
+        
+        if (bookings[date]) {
+            bookings[date] = bookings[date].filter(seat => !seatIds.includes(seat.id));
+            
+            if (bookings[date].length === 0) {
+                delete bookings[date];
+            }
+            
+            localStorage.setItem('cinemaBookings', JSON.stringify(bookings));
+            
+            const updatedBookings = getAllBookingsWithDates();
+            setAllBookings(updatedBookings);
+            
+            const bookedSeatsForDate = getBookedSeatsForDate(selectedDate);
+            const bookedSeatIds = bookedSeatsForDate.map(seat => seat.id);
+            
+            setSeats(prevSeats => 
+                prevSeats.map((row) => 
+                    row.map((seat) => ({
+                        ...seat,
+                        status: bookedSeatIds.includes(seat.id) ? "booked" : "available"
+                    }))
+                )
+            );
+            
+            if (bookings[date] && bookings[date].length === 0) {
+                const remainingDates = Object.keys(updatedBookings).sort();
+                setActiveTab(remainingDates[0] || null);
+            }
+        }
+    };
+
+    const formatDisplayDate = (dateString) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    };
+
     const colors = [
         "blue",
         "purple",
@@ -91,6 +145,8 @@ const CinemaSeatBooking = ({
 
     const [seats, setSeats] = useState(initializeSeats);
     const [selectedSeats, setSelectedSeats] = useState([]);
+    const [activeTab, setActiveTab] = useState(null);
+    const [allBookings, setAllBookings] = useState({});
 
     const getColorClass = (colorName) => {
         const colorMap = {
@@ -209,12 +265,29 @@ const CinemaSeatBooking = ({
         );
 
         setSelectedSeats([]);
+        
+        const updatedBookings = getAllBookingsWithDates();
+        setAllBookings(updatedBookings);
+        
+        const bookingDates = Object.keys(updatedBookings).sort();
+        if (bookingDates.length > 0 && !activeTab) {
+            setActiveTab(bookingDates[0]);
+        }
     } 
 
     useEffect(() => {
     setSelectedSeats([]);
     setSeats(initializeSeats);
 }, [selectedDate, initializeSeats]);
+
+    useEffect(() => {
+        const bookings = getAllBookingsWithDates();
+        setAllBookings(bookings);
+        const bookingDates = Object.keys(bookings).sort();
+        if (!activeTab && bookingDates.length > 0) {
+            setActiveTab(bookingDates[0]);
+        }
+    }, [selectedDate]);
 
 
 
@@ -349,6 +422,69 @@ const CinemaSeatBooking = ({
                     : "Select Seats to Book"    
                 }
             </button>
+
+            {/* Booking List Section */}
+            <div className='mt-8 border-t pt-6'>
+                <h2 className='text-xl font-bold text-center mb-6 text-gray-800'>All Bookings</h2>
+                
+                {Object.keys(allBookings).length > 0 ? (
+                    <div>
+                        {/* Date Tabs */}
+                        <div className='flex flex-wrap justify-center gap-2 mb-6'>
+                            {Object.keys(allBookings).sort().map((date) => (
+                                <button
+                                    key={date}
+                                    onClick={() => setActiveTab(date)}
+                                    className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
+                                        activeTab === date
+                                            ? 'bg-blue-500 text-white'
+                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                    }`}
+                                >
+                                    {formatDisplayDate(date)}
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Bookings for Active Tab */}
+                        {activeTab && allBookings[activeTab] && (
+                            <div className='space-y-4'>
+                                {allBookings[activeTab].map((seat) => (
+                                    <div
+                                        key={seat.id}
+                                        className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200'
+                                    >
+                                        <div className='flex justify-between items-center'>
+                                            <div className='flex items-center gap-4'>
+                                                <span className={`px-3 py-1 rounded font-medium text-sm ${getColorClass(seat.color)}`}>
+                                                    {seat.id}
+                                                </span>
+                                                <span className='text-gray-600'>
+                                                    {seat.type.charAt(0).toUpperCase() + seat.type.slice(1)}
+                                                </span>
+                                                <span className='text-lg font-bold text-green-600'>
+                                                    {currency}{seat.price}
+                                                </span>
+                                            </div>
+                                            
+                                            <button
+                                                onClick={() => cancelBooking(activeTab, [seat.id])}
+                                                className='px-3 py-2 bg-red-500 text-white text-sm font-medium rounded-lg hover:bg-red-600 transition-colors duration-200'
+                                            >
+                                                Cancel
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <div className='text-center py-8 text-gray-500'>
+                        No bookings available. Make your first booking above!
+                    </div>
+                )}
+            </div>
         </div>
     </div>
   );
