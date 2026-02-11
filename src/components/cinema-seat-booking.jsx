@@ -20,6 +20,19 @@ const CinemaSeatBooking = ({
     subTitle = "Select your seats"
 }) => {
 
+    const [selectedDate, setSelectedDate] = useState(() => {
+        const today = new Date();
+        return today.toISOString().split('T')[0];
+    });
+
+    const getBookedSeatsForDate = (date) => {
+        const storedBookings = localStorage.getItem('cinemaBookings');
+        if (!storedBookings) return [];
+        
+        const bookings = JSON.parse(storedBookings);
+        return bookings[date] || [];
+    };
+
     const colors = [
         "blue",
         "purple",
@@ -47,6 +60,8 @@ const CinemaSeatBooking = ({
     };
 
     const initializeSeats = useMemo(() => {
+        const bookedSeatsForDate = getBookedSeatsForDate(selectedDate);
+        const bookedSeatIds = bookedSeatsForDate.map(seat => seat.id);
 
         const seats = [];
 
@@ -64,7 +79,7 @@ const CinemaSeatBooking = ({
                     type: seatTypeInfo?.type || "regular",
                     price: seatTypeInfo?.price || 150,
                     color: seatTypeInfo?.color || "blue",
-                    status: bookedSeats.includes(seatId) ? "booked":"available",
+                    status: bookedSeatIds.includes(seatId) ? "booked":"available",
                     selected: false,
                 });
             }
@@ -72,7 +87,7 @@ const CinemaSeatBooking = ({
         }
         return seats;
 
-    },[layout, seatTypes, bookedSeats]);
+    },[layout, seatTypes, selectedDate]);
 
     const [seats, setSeats] = useState(initializeSeats);
     const [selectedSeats, setSelectedSeats] = useState([]);
@@ -164,10 +179,15 @@ const CinemaSeatBooking = ({
             return;
         }
 
-        const existingBookedSeats = localStorage.getItem('bookedSeats');
-        const bookedArray = existingBookedSeats ? JSON.parse(existingBookedSeats) : [];
-        const newBookedSeats = [...bookedArray, ...selectedSeats];
-        localStorage.setItem('bookedSeats', JSON.stringify(newBookedSeats));
+        const existingBookings = localStorage.getItem('cinemaBookings');
+        const bookings = existingBookings ? JSON.parse(existingBookings) : {};
+        
+        if (!bookings[selectedDate]) {
+            bookings[selectedDate] = [];
+        }
+        
+        bookings[selectedDate] = [...bookings[selectedDate], ...selectedSeats];
+        localStorage.setItem('cinemaBookings', JSON.stringify(bookings));
 
         setSeats((prevSeats) => {
             return prevSeats.map((row) => row.map((seat) => {
@@ -192,51 +212,12 @@ const CinemaSeatBooking = ({
     } 
 
     useEffect(() => {
-    const storedSeats = localStorage.getItem('selectedSeats');
-    
-    if(storedSeats) {
-        try {
-            const parsedSeats = JSON.parse(storedSeats);
-            setSelectedSeats(parsedSeats);
-            
-            setSeats((prevSeats) => {
-                return prevSeats.map((row, rIdx) => 
-                    row.map((seat, sIdx) => ({
-                        ...seat,
-                        selected: parsedSeats.some(selectedSeat => selectedSeat.id === seat.id)
-                    }))
-                );
-            });
-        }
-        catch (error) {
-            console.error(`Error parsing seats: ${error}`);
-        }
-    }
-}, []);
+    setSelectedSeats([]);
+    setSeats(initializeSeats);
+}, [selectedDate, initializeSeats]);
 
 
-useEffect( () => {
-        const storedBookedSeats = localStorage.getItem('bookedSeats');
-        
-        if(storedBookedSeats) {
-            try {
-                const parsedBookedSeats = JSON.parse(storedBookedSeats);
-                const bookedSeatIds = parsedBookedSeats.map(seat => seat.id);
-                
-                setSeats((prevSeats) => {
-                    return prevSeats.map((row, rIdx) => row.map((seat, sIdx) => {
-                        if(bookedSeatIds.includes(seat.id)) {
-                            return {...seat, status: "booked", selected: false};
-                        }
-                        return seat;
-                    }));
-                });
-            }
-            catch (error) {
-                console.error(`Error parsing booked seats: ${error}`);
-            }
-        }
-    }, []);
+
 
   return (
     <div className='w-full min-h-screen bg-gray-50 p-4'>
@@ -247,6 +228,29 @@ useEffect( () => {
             {/* title */}
             <h1 className='text-2xl lg:text-3xl font-bold text-center mb-2 text-gray-800'>{title}</h1>
             <p className='text-center text-gray-600 mb-6 text-2xl'>{subTitle}</p>
+
+            {/* Date Picker */}
+            <div className='mb-6 flex flex-col items-center'>
+                <label htmlFor='date-picker' className='block text-sm font-medium text-gray-700 mb-2'>
+                    Select Booking Date
+                </label>
+                <input
+                    type='date'
+                    id='date-picker'
+                    value={selectedDate}
+                    onChange={(e) => setSelectedDate(e.target.value)}
+                    min={new Date().toISOString().split('T')[0]}
+                    className='px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                />
+                <p className='mt-2 text-sm text-gray-500'>
+                    Bookings for: {new Date(selectedDate).toLocaleDateString('en-US', { 
+                        weekday: 'long', 
+                        year: 'numeric', 
+                        month: 'long', 
+                        day: 'numeric' 
+                    })}
+                </p>
+            </div>
         
         
             {/* screen */}

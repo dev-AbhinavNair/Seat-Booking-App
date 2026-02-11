@@ -18,8 +18,6 @@ function App() {
         vip: {name: "VIP", price: 350, rows: [6, 7]}
       }}
 
-      bookedSeats={[]}
-      onBookingComplete={(booking) => console.log(booking)}
       />
     </>
   )
