@@ -150,21 +150,21 @@ const CinemaSeatBooking = ({
 
     const getColorClass = (colorName) => {
         const colorMap = {
-            blue: "bg-blue-100 border-blue-300 text-blue-800 hover:bg-blue-200",
-            purple: "bg-purple-100 border-purple-300 text-purple-800 hover:bg-purple-200",
-            yellow: "bg-yellow-100 border-yellow-300 text-yellow-800 hover:bg-yellow-200",
-            green: "bg-green-100 border-green-300 text-green-800 hover:bg-green-200",
-            red: "bg-red-100 border-red-300 text-red-800 hover:bg-red-200",
-            indigo: "bg-indigo-100 border-indigo-300 text-indigo-800 hover:bg-indigo-200",
-            pink: "bg-pink-100 border-pink-300 text-pink-800 hover:bg-pink-200",
-            gray: "bg-gray-100 border-gray-300 text-gray-800 hover:bg-gray-200"
+            blue: "bg-blue-500 border-blue-300 text-white hover:bg-blue-400 hover:shadow-lg hover:shadow-blue-400/50",
+            purple: "bg-purple-500 border-purple-300 text-white hover:bg-purple-400 hover:shadow-lg hover:shadow-purple-400/50",
+            yellow: "bg-yellow-500 border-yellow-300 text-white hover:bg-yellow-400 hover:shadow-lg hover:shadow-yellow-400/50",
+            green: "bg-green-500 border-green-300 text-white hover:bg-green-400 hover:shadow-lg hover:shadow-green-400/50",
+            red: "bg-red-500 border-red-300 text-white hover:bg-red-400 hover:shadow-lg hover:shadow-red-400/50",
+            indigo: "bg-indigo-500 border-indigo-300 text-white hover:bg-indigo-400 hover:shadow-lg hover:shadow-indigo-400/50",
+            pink: "bg-pink-500 border-pink-300 text-white hover:bg-pink-400 hover:shadow-lg hover:shadow-pink-400/50",
+            gray: "bg-gray-500 border-gray-300 text-white hover:bg-gray-400 hover:shadow-lg hover:shadow-gray-400/50"
         }
 
         return colorMap[colorName] || colorMap.blue;
     }
 
     const getSeatClassName = (seat) => {
-        const baseClass =  "w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 m-1 rounded-t-lg border-2 cursor-pointer transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-bold bg-blue-100 border-blue-300 text-blue-800"
+        const baseClass =  "w-8 h-8 sm:w-10 sm:h-10 lg:w-12 lg:h-12 m-1 border-2 cursor-pointer transition-all duration-200 flex items-center justify-center text-xs sm:text-sm font-bold bg-blue-100 border-blue-300 text-blue-800"
 
         if(seat.status === "booked") {
             return `${baseClass} bg-gray-400 border-gray-500 text-gray-600 cursor-not-allowed`;
@@ -293,18 +293,18 @@ const CinemaSeatBooking = ({
 
 
   return (
-    <div className='w-full min-h-screen bg-gray-50 p-4'>
+    <div className='w-full min-h-screen bg-gray-900 p-4'>
 
 
-        <div className='max-w-6xl mx-auto bg-white rounded-lg shadow-lg p-6'>
+        <div className='max-w-6xl mx-auto bg-gray-800 rounded-lg shadow-lg p-6'>
 
             {/* title */}
-            <h1 className='text-2xl lg:text-3xl font-bold text-center mb-2 text-gray-800'>{title}</h1>
-            <p className='text-center text-gray-600 mb-6 text-2xl'>{subTitle}</p>
+            <h1 className='text-2xl lg:text-3xl font-bold text-center mb-2 text-gray-100'>{title}</h1>
+            <p className='text-center text-gray-300 mb-6 text-2xl'>{subTitle}</p>
 
             {/* Date Picker */}
             <div className='mb-6 flex flex-col items-center'>
-                <label htmlFor='date-picker' className='block text-sm font-medium text-gray-700 mb-2'>
+                <label htmlFor='date-picker' className='block text-sm font-medium text-gray-300 mb-2'>
                     Select Booking Date
                 </label>
                 <input
@@ -313,9 +313,9 @@ const CinemaSeatBooking = ({
                     value={selectedDate}
                     onChange={(e) => setSelectedDate(e.target.value)}
                     min={new Date().toISOString().split('T')[0]}
-                    className='px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+                    className='px-4 py-2 border border-gray-600 bg-gray-700 text-gray-100 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
                 />
-                <p className='mt-2 text-sm text-gray-500'>
+                <p className='mt-2 text-sm text-gray-400'>
                     Bookings for: {new Date(selectedDate).toLocaleDateString('en-US', { 
                         weekday: 'long', 
                         year: 'numeric', 
@@ -329,7 +329,7 @@ const CinemaSeatBooking = ({
             {/* screen */}
             <div className='mb-8'>
                 <div className='w-full h-4 bg-gradient-to-r from-gray-300 via-gray-400 to-gray-300 rounded-lg mb-2 shadow-inner'/>
-                    <p className='text-center text-sm text-gray-500 font-medium'
+                    <p className='text-center text-sm text-gray-400 font-medium'
                     >SCREEN</p>
             </div>
 
@@ -339,7 +339,7 @@ const CinemaSeatBooking = ({
                 <div className='flex flex-col items-center min-w-max'>{seats.map((row, rowIndex) => {
                     return (
                         <div key={rowIndex} className='flex items-center mb-2'>
-                            <span className='w-8 text-center font-bold text-gray-600 mr-4'>
+                            <span className='w-8 text-center font-bold text-gray-400 mr-4'>
                                 {String.fromCharCode(65+rowIndex)}
                             </span>
                             {renderSeatSection(row, 0, layout.aislePosition)}
@@ -356,13 +356,13 @@ const CinemaSeatBooking = ({
 
             {/* legend */}
                 
-            <div className='flex flex-wrap justify-center gap-6 mb-6 p-4 bg-gray-50 rounded-lg'>
+            <div className='flex flex-wrap justify-center gap-6 mb-6 p-4 bg-gray-700 rounded-lg'>
                 {uniqueSeatTypes.map((seatType) => {
 
                     return (
                     <div key={seatType.type} className='flex items-center'>
-                        <div className={`w-6 h-6 border-2 rounded-t-lg mr-2 ${getColorClass(seatType.color) || "bg-blue-100 border-blue-300"}`}></div>
-                        <span className='text-sm'>
+                        <div className={`w-6 h-6 border-2 rounded-t-lg mr-2 flex items-center justify-center text-xs font-bold ${getColorClass(seatType.color) || "bg-blue-500 border-blue-300 text-white"}`}>S</div>
+                        <span className='text-sm text-gray-300'>
                             {seatType.name} ({currency}
                             {seatType.price})
                         </span>
@@ -372,37 +372,37 @@ const CinemaSeatBooking = ({
 
                 <div className='flex items-center'>
                     <div className='w-6 h-6 bg-green-500 border-2 border-green-600 rounded-t-lg mr-2'></div>
-                    <span className='text-sm'>Selected</span>
+                    <span className='text-sm text-gray-300'>Selected</span>
                 </div>
                 <div className='flex items-center'>
-                    <div className='w-6 h-6 bg-gray-400 border-2 brder-green-500 rounded-t-lg mr-2'></div>
-                    <span className='text-sm'>Booked</span>
+                    <div className='w-6 h-6 bg-gray-400 border-2 border-green-500 rounded-t-lg mr-2'></div>
+                    <span className='text-sm text-gray-300'>Booked</span>
                 </div>
             </div>
 
             {/* summary */}
 
-            <div className='bg-gray-50 rounded-lg p-4 mb-4'>
-                <h3 className='font-bold text-lg mb-2'>Booking Summary</h3>
+            <div className='bg-gray-700 rounded-lg p-4 mb-4'>
+                <h3 className='font-bold text-lg mb-2 text-gray-100'>Booking Summary</h3>
                 {selectedSeats.length > 0 ? (
                     <div>
-                        <p className='mb-2'>
+                        <p className='mb-2 text-gray-300'>
                         Selected Seats: {' '}
-                        <span className='font-medium'>
+                        <span className='font-medium '>
                         {selectedSeats.map((s) => s.id).join(", ")}
                         </span>
                         </p>
-                        <p className='mb-2'>
+                        <p className='mb-2 text-gray-300'>
                             Number of Seats: {' '}
                             <span className='font-medium'>{selectedSeats.length}</span>
                         </p>
-                        <p className='text-xl font-bold text-green-600'>
+                        {/* <p className='text-xl font-bold text-green-600'>
                             Total: {currency}
                             {getTotalPrice()}
-                        </p>
+                        </p> */}
                     </div>
                 ): (
-                    <p className='text-gray-500'>No Seats Selected</p>
+                    <p className='text-gray-400'>No Seats Selected</p>
                 )}
             </div>
 
@@ -413,7 +413,7 @@ const CinemaSeatBooking = ({
             disabled={selectedSeats.length === 0}
             className={`w-full py-3 px-6 rounded-lg font-bold text-lg transition-all duration-200 ${
                 selectedSeats.length > 0 ? 
-                "bg-green-500 hover:bg-green-600 text-white transform hover:scale-105"
+                "bg-green-500 hover:bg-green-600 text-white transform hover:scale-102"
                 : "bg-gray-300 text-gray-500 cursor-not-allowed"
             }`}
             >
@@ -424,8 +424,8 @@ const CinemaSeatBooking = ({
             </button>
 
             {/* Booking List Section */}
-            <div className='mt-8 border-t pt-6'>
-                <h2 className='text-xl font-bold text-center mb-6 text-gray-800'>All Bookings</h2>
+            <div className='mt-8 border-t border-gray-600 pt-6'>
+                <h2 className='text-xl font-bold text-center mb-6 text-gray-100'>All Bookings</h2>
                 
                 {Object.keys(allBookings).length > 0 ? (
                     <div>
@@ -438,7 +438,7 @@ const CinemaSeatBooking = ({
                                     className={`px-4 py-2 rounded-lg font-medium transition-all duration-200 ${
                                         activeTab === date
                                             ? 'bg-blue-500 text-white'
-                                            : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                                            : 'bg-gray-600 text-gray-300 hover:bg-gray-500'
                                     }`}
                                 >
                                     {formatDisplayDate(date)}
@@ -452,14 +452,14 @@ const CinemaSeatBooking = ({
                                 {allBookings[activeTab].map((seat) => (
                                     <div
                                         key={seat.id}
-                                        className='bg-white border border-gray-200 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200'
+                                        className='bg-gray-800 border border-gray-600 rounded-lg p-4 shadow-sm hover:shadow-md transition-shadow duration-200'
                                     >
                                         <div className='flex justify-between items-center'>
                                             <div className='flex items-center gap-4'>
-                                                <span className={`px-3 py-1 rounded font-medium text-sm ${getColorClass(seat.color)}`}>
+                                                <span className={`px-3 py-1 rounded font-bold text-sm ${getColorClass(seat.color)}`}>
                                                     {seat.id}
                                                 </span>
-                                                <span className='text-gray-600'>
+                                                <span className='text-gray-400'>
                                                     {seat.type.charAt(0).toUpperCase() + seat.type.slice(1)}
                                                 </span>
                                                 <span className='text-lg font-bold text-green-600'>
@@ -480,7 +480,7 @@ const CinemaSeatBooking = ({
                         )}
                     </div>
                 ) : (
-                    <div className='text-center py-8 text-gray-500'>
+                    <div className='text-center py-8 text-gray-400'>
                         No bookings available. Make your first booking above!
                     </div>
                 )}
